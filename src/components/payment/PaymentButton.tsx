@@ -11,11 +11,11 @@ export default function PaymentButton({ amount }: PaymentButtonProps) {
 
   const handlePayment = async () => {
     setIsProcessing(true);
-    // In a real application, you would integrate with your payment processor here
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
+    // Simulate payment processing
+    await new Promise(resolve => setTimeout(resolve, 1500));
     clearCart();
     setIsProcessing(false);
-    alert('Thank you for your order! Our team will contact you shortly with payment instructions.');
+    alert('Payment successful! Thank you for your order.');
   };
 
   return (
@@ -24,7 +24,7 @@ export default function PaymentButton({ amount }: PaymentButtonProps) {
       disabled={isProcessing}
       className="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors disabled:bg-gray-400"
     >
-      {isProcessing ? 'Processing...' : 'Complete Order'}
+      {isProcessing ? 'Processing...' : 'Complete Payment'}
     </button>
   );
 }

@@ -1,3 +1,15 @@
+export interface ShipmentFormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+}
+
 export interface NodeConfig {
   software: 'Dappnode' | 'Stereum' | 'Sege' | 'Coincashew' | 'Blockops';
   ram: '16GB' | '32GB' | '64GB';
@@ -22,10 +34,4 @@ export interface CartItem extends Product {
   quantity: number;
   config: NodeConfig;
   totalPrice: number;
-}
-
-export interface PaymentConfig {
-  currency: string;
-  amount: number;
-  receiver: string;
 }

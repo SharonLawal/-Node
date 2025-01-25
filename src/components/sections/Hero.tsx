@@ -1,143 +1,157 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Server, Shield, Recycle, Layers } from 'lucide-react';
+import { ArrowRight, Server, Shield, Recycle, Zap, Globe, Cpu } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Hero() {
   return (
-    <section className="relative bg-gradient-to-br from-[#1a1a2e] to-[#16162a] text-white overflow-hidden min-h-screen flex items-center">
+    <section className="relative min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white overflow-hidden">
+      {/* Animated background particles */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0">
-          {/* Ethereum-inspired particle effect */}
-          {[...Array(30)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute"
-              initial={{ y: Math.random() * 100 }}
-              animate={{ 
-                y: [Math.random() * 100, Math.random() * -100],
-                opacity: [0.2, 0.5, 0.2]
-              }}
-              transition={{
-                duration: Math.random() * 3 + 2,
-                repeat: Infinity,
-                ease: "linear"
-              }}
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-            >
-              <div className="w-2 h-2 bg-[#64ffda] rounded-full opacity-20"></div>
-            </motion.div>
-          ))}
-        </div>
+        {[...Array(50)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 bg-green-500/20 rounded-full"
+            initial={{ 
+              x: Math.random() * window.innerWidth,
+              y: Math.random() * window.innerHeight 
+            }}
+            animate={{
+              y: [0, -20, 0],
+              opacity: [0.2, 0.5, 0.2],
+            }}
+            transition={{
+              duration: Math.random() * 3 + 2,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          />
+        ))}
       </div>
 
-      <div className="container mx-auto px-4 py-20 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div 
-            className="mb-8 relative"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+      <div className="relative container mx-auto px-4 pt-32 pb-20">
+        <div className="max-w-5xl mx-auto">
+          {/* Hero Content */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
+            className="text-center mb-16"
           >
-            {/* Ethereum-inspired logo animation */}
-            <div className="relative w-24 h-24 mx-auto">
-              <motion.div
-                animate={{ 
-                  rotateY: 360,
-                  scale: [1, 1.1, 1]
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "linear"
-                }}
-                className="absolute inset-0 flex items-center justify-center"
+            <motion.div 
+              className="flex justify-center mb-8"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ 
+                type: "spring",
+                stiffness: 260,
+                damping: 20 
+              }}
+            >
+              <div className="relative w-24 h-24">
+                <motion.div
+                  animate={{ 
+                    rotate: 360,
+                    scale: [1, 1.2, 1]
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "linear"
+                  }}
+                >
+                  <Server className="w-24 h-24 text-green-400" />
+                </motion.div>
+              </div>
+            </motion.div>
+
+            <motion.h1 
+              className="text-5xl md:text-7xl font-bold mb-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              Power the Future of
+              <span className="block mt-2 bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
+                Ethereum Infrastructure
+              </span>
+            </motion.h1>
+
+            <motion.p 
+              className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              Join the decentralized revolution with our sustainable, pre-configured 
+              node solutions. Built for reliability, optimized for performance.
+            </motion.p>
+
+            <motion.div 
+              className="flex flex-col sm:flex-row gap-6 justify-center mb-20"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+            >
+              <Link 
+                to="/products"
+                className="group bg-green-500 text-white px-8 py-4 rounded-lg hover:bg-green-600 
+                         transition-all transform hover:scale-105 flex items-center justify-center gap-2"
               >
-                <Server className="h-20 w-20 text-[#64ffda]" />
-              </motion.div>
+                Start Your Node Journey
+                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link 
+                to="/about"
+                className="bg-transparent border-2 border-green-500 text-green-500 px-8 py-4 
+                         rounded-lg hover:bg-green-500/10 transition-all transform hover:scale-105"
+              >
+                Learn More
+              </Link>
+            </motion.div>
+
+            {/* Feature Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: Shield,
+                  title: "Pre-configured Security",
+                  description: "Enterprise-grade security measures built-in"
+                },
+                {
+                  icon: Zap,
+                  title: "Energy Efficient",
+                  description: "Optimized for minimal power consumption"
+                },
+                {
+                  icon: Globe,
+                  title: "Global Support",
+                  description: "24/7 technical assistance worldwide"
+                }
+              ].map((feature, index) => (
+                <motion.div
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.9 + index * 0.2 }}
+                  className="group bg-gray-800/50 backdrop-blur-sm p-8 rounded-xl 
+                           hover:bg-gray-700/50 transition-all duration-300 border border-green-500/20"
+                >
+                  <div className="bg-green-500/10 w-16 h-16 rounded-full flex items-center 
+                                justify-center mx-auto mb-6 group-hover:scale-110 transition-transform"
+                  >
+                    <feature.icon className="h-8 w-8 text-green-400" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-4">{feature.title}</h3>
+                  <p className="text-gray-400">{feature.description}</p>
+                </motion.div>
+              ))}
             </div>
           </motion.div>
-
-          <motion.h1 
-            className="text-4xl md:text-6xl font-bold mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            Power the
-            <span className="bg-gradient-to-r from-[#64ffda] to-[#00b4d8] bg-clip-text text-transparent block mt-2">
-              Ethereum Network
-            </span>
-          </motion.h1>
-
-          <motion.p 
-            className="text-xl text-gray-300 mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            Join the decentralized future with our sustainable node solutions.
-            Support Ethereum mainnet and popular L2 networks.
-          </motion.p>
-
-          <motion.div 
-            className="flex flex-col sm:flex-row gap-4 justify-center mb-20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-          >
-            <Link 
-              to="/products"
-              className="bg-[#64ffda] text-gray-900 px-8 py-4 rounded-lg hover:bg-[#4ad8b7] transition-all transform hover:scale-105 flex items-center justify-center gap-2 group font-semibold"
-            >
-              Start Validating
-              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link 
-              to="/about"
-              className="bg-gray-800 text-[#64ffda] border border-[#64ffda] px-8 py-4 rounded-lg hover:bg-[#64ffda]/10 transition-all transform hover:scale-105"
-            >
-              Learn More
-            </Link>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Server,
-                title: "Mainnet Ready",
-                description: "Optimized for Ethereum mainnet validation"
-              },
-              {
-                icon: Layers,
-                title: "L2 Compatible",
-                description: "Support for Arbitrum, Optimism, and more"
-              },
-              {
-                icon: Shield,
-                title: "MEV Protected",
-                description: "Built-in MEV-boost configuration"
-              }
-            ].map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                className="group bg-gray-800/50 backdrop-blur-sm p-6 rounded-xl hover:bg-gray-700/50 transition-colors border border-[#64ffda]/20"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.8 + index * 0.2 }}
-              >
-                <div className="bg-[#64ffda]/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <feature.icon className="h-8 w-8 text-[#64ffda]" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-gray-400">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </div>
+
+      {/* Animated wave bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-gray-900 to-transparent" />
     </section>
   );
 }
