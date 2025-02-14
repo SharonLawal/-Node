@@ -25,7 +25,7 @@ app.use(bodyParser.json());
 
 // Configure CORS to allow frontend connection with credentials
 app.use(cors({
-  origin: "http://localhost:5173", // Change this if frontend URL is different
+  origin: ["http://localhost:5173", "https://nodebridge101.netlify.app"], // Allow multiple origins
   credentials: true, // Allow cookies and session sharing
 }));
 

@@ -1,27 +1,32 @@
-const nodemailer = require("nodemailer");
+const nodemailer = require('nodemailer');
+require('dotenv').config(); // Load .env variables
 
-const sendEmail = async (to, subject, text) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail", // Use your email provider
-    auth: {
-      user: process.env.EMAIL_USER, // Your email
-      pass: process.env.EMAIL_PASS, // Your email password
-    },
-  });
+// Create a transporter using Mailtrap SMTP
+const transporter = nodemailer.createTransport({
+  host: "sandbox.smtp.mailtrap.io",
+  port: 2525,
+  auth: {
+    user: "4e800accdef8ef",
+    pass: "074dc04008a5bc"
+  }
+});
 
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to,
-    subject,
-    text,
-  };
-
+// Send email function
+const sendTestEmail = async () => {
   try {
-    await transporter.sendMail(mailOptions);
-    console.log("Email sent successfully");
+    let info = await transporter.sendMail({
+      from: '"Your App Name" <no-reply@yourapp.com>',
+      to: "opeterro007@gmail.com", // Replace with recipient email
+      subject: "Hello from Mailtrap",
+      text: "This is a test email!",
+      html: "<b>This is a test email!</b>",
+    });
+
+    console.log("Email sent:", info.messageId);
   } catch (error) {
-    console.error("Error sending email", error);
+    console.error("Error sending email:", error);
   }
 };
 
-module.exports = sendEmail;
+// Call the function for testing
+sendTestEmail();

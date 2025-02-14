@@ -1,18 +1,3 @@
-/**
- * Product Schema Definition
- * 
- * This schema defines the structure for storing product details in the database.
- * Each product has an ID, name, description, base price, and an image.
- * Additionally, the schema includes customizable specifications (specs),
- * such as software, RAM, storage, and processor. 
- * 
- * The available options for each spec are defined using enums, with the first 
- * value serving as the default selection when a user views the product.
- * 
- * The frontend allows users to switch options using a dropdown, but by default, 
- * the first item in each enum is preselected.
- */
-
 const mongoose = require('mongoose');
 
 // Define the product schema
@@ -30,8 +15,20 @@ const productSchema = new mongoose.Schema({
     type: String, // Description of the product
     required: true,
   },
-  basePrice: {
+  price: {
     type: Number, // Price of the product
+    required: true,
+  },
+  crypto_price: {
+    type: Number, // Price in cryptocurrency (ETH, BTC, etc.)
+    required: true,
+  },
+  connectivity: {
+    type: String, // Connectivity options (e.g., WiFi, Ethernet)
+    required: true,
+  },
+  pre_installed_software: {
+    type: String, // Pre-installed software details
     required: true,
   },
   image: {
