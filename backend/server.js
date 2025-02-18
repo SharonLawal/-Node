@@ -24,8 +24,6 @@ app.use(express.json());
 app.use(bodyParser.json());
 
 // Configure CORS to allow frontend connection with credentials
-const cors = require("cors");
-
 app.use(cors({
   origin: ["http://localhost:5173", "http://localhost:5174", "https://nodebridge101.netlify.app", "https://node-307s.onrender.com"], // Add your backend domain
   credentials: true, // Allow cookies and session sharing
