@@ -9,9 +9,10 @@ export interface Product {
   id: string;
   name: string;
   description: string;
-  basePrice: number;
+  price: number;
   image: string;
   specs: {
+    defaultSoftware: string;
     defaultRam: string;
     defaultStorage: string;
     defaultProcessor: string;
