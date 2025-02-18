@@ -82,7 +82,7 @@ const Products = () => {
       </div>
 
       {/* Workstations by Processors Section */}
-      <div className="py-4 px-4 bg-[#17172B] p-5">
+      {/* <div className="py-4 px-4 bg-[#17172B] p-5">
         <div className="flex items-center justify-center w-full py-4">
           <div className="flex-1 h-[2px] bg-[#D1D1D6]"></div>
           <h2 className="mx-4 text-white text-lg font-semibold">
@@ -98,8 +98,9 @@ const Products = () => {
             logo="amd"
             image={thread} type="threadripper"/>
       </div>
+        </div> */}
+        
       {/* Products Section */}
-        </div>
       <div className="p-5 space-y-4">
         <ProductSearch />
         {isLoading ? ( // Show loading animation if data is being fetched

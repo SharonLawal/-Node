@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { ShoppingCart, X } from 'lucide-react';
-import { useCartStore } from '../store/cartStore';
-import PaymentButton from './PaymentButton';
+import { useState } from "react";
+import { ShoppingCart, X } from "lucide-react";
+import { useCartStore } from "../store/cartStore";
+import PaymentButton from "./PaymentButton";
 
 export default function Cart() {
   const { items, removeItem, getTotalPrice } = useCartStore();
@@ -35,33 +35,42 @@ export default function Cart() {
               <p className="text-gray-500">Your cart is empty</p>
             ) : (
               <>
-                {items.map((item) => (
-                  <div key={item.id} className="border-b py-4">
-                    <div className="flex justify-between">
-                      <div>
-                        <h3 className="font-semibold">{item.name}</h3>
-                        <p className="text-sm text-gray-600">
-                          {item.config.software} - {item.config.ram} - {item.config.storage} - {item.config.processor}
-                        </p>
-                        <p className="text-sm">Quantity: {item.quantity}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold">${item.totalPrice}</p>
-                        <button
-                          onClick={() => removeItem(item.id)}
-                          className="text-red-500 text-sm"
-                        >
-                          Remove
-                        </button>
+                {items.map((item) => {
+                  console.log("Cart item:", item); // Debugging line
+                  return (
+                    <div key={item.id} className="border-b py-4">
+                      <div className="flex justify-between">
+                        <div>
+                          <h3 className="font-semibold">{item.name}</h3>
+                          <p className="text-sm text-gray-600">
+                            {item.config
+                              ? `${item.config.software || "Unknown"} - ${
+                                  item.config.ram || "N/A"
+                                } - ${item.config.storage || "N/A"} - ${
+                                  item.config.processor || "N/A"
+                                }`
+                              : "Configuration missing"}
+                          </p>
+                          <p className="text-sm">Quantity: {item.quantity}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold">${item.totalPrice}</p>
+                          <button
+                            onClick={() => removeItem(item.id)}
+                            className="text-red-500 text-sm"
+                          >
+                            Remove
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
 
                 <div className="mt-6">
                   <div className="flex justify-between text-xl font-bold mb-4">
                     <span>Total:</span>
-                    <span>${getTotalPrice()}</span>
+                    <span>${getTotalPrice().toFixed(2)}</span>
                   </div>
                   <PaymentButton amount={getTotalPrice()} />
                 </div>
