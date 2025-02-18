@@ -13,7 +13,8 @@ export const RAM_OPTIONS = {
 } as const;
 
 export const STORAGE_OPTIONS = {
-  '2TB SSD': { label: '2TB SSD', price: 0 },
+  '1TB SSD': { label: '1TB SSD', price: 0 },
+  '2TB SSD': { label: '2TB SSD', price: 100 },
   '4TB SSD': { label: '4TB SSD', price: 200 }
 } as const;
 

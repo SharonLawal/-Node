@@ -8,7 +8,7 @@ export default function Cart() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <>
+    <div className=''>
       <button
         onClick={() => setIsOpen(true)}
         className="relative p-2 text-white hover:text-green-400"
@@ -79,6 +79,6 @@ export default function Cart() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

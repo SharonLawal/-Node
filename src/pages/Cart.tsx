@@ -7,49 +7,35 @@ import casi from "../assets/case.png";
 import star from "../assets/Stars.png";
 import ShippingModals from "./Ship";
 import OrderSummary from "./OrderSummary";
+import { RootState } from "../store";
+import { useSelector } from "react-redux";
+import { ICartItem, IProduct } from "../types";
+import { useCartStore } from "@/store/cartStore";
 
-const PRODUCTS = [
-  {
-    id: 1,
-    name: "Ryzen B650 MATX",
-    price: 900000,
-    quantity: 1,
-    image: speaker,
-  },
-  {
-    id: 2,
-    name: "DAppNode Home Pro",
-    price: 700000,
-    quantity: 2,
-    image: casi,
-  },
-];
+
+
 
 function Cart() {
   const [isShippingModalOpen, setIsShippingModalOpen] = useState(false);
-  const [products, setProducts] = useState(PRODUCTS);
+  const [products, setProducts] = useState([]);
   const [showOrderItem, setShowOrderItem] = useState(false);
   const [isNextPage, setIsNextPage] = useState(false);
-  // Function to update quantity
-  const updateQuantity = (id: number, change: number) => {
-    setProducts(
-      products.map((product) =>
-        product.id === id
-          ? { ...product, quantity: Math.max(1, product.quantity + change) }
-          : product
-      )
-    );
-  };
+  // const cartItems = useSelector((state: any) => state.cart.items);
+    const { items, addItem, clearCart, removeItem, getTotalPrice } = useCartStore();
+  
+  // console.log(cartItems)
 
-  const removeProduct = (id: number) => {
-    setProducts(products.filter((product) => product.id !== id));
-  };
+  // Function to update quantity
+
+
+
 
   // Function to handle modal submit
   const handleModalSubmit = () => {
     setShowOrderItem(true);
     setIsShippingModalOpen(false);
     setIsNextPage(true);
+    clearCart();
     console.log("object");
   };
 
@@ -63,7 +49,7 @@ function Cart() {
           >
             <ArrowLeft size={16} />
           </Link>
-          <div className="gap-4 border-2 border-dashed border-gray-400 p-4 rounded-lg w-[1200px]">
+          <div className="gap-4 border-2 border-dashed border-gray-400 p-4 rounded-lg w-full">
             <div className="flex-1 text-black text-3xl font-bold">Cart</div>
           </div>
         </div>
@@ -82,7 +68,7 @@ function Cart() {
 
             {/* Product Items */}
             <div className="space-y-6 py-6 border-b border-cyan-500">
-              {products.map((product) => (
+              {items.map((product) => (
                 <div
                   key={product.id}
                   className="grid grid-cols-12 items-center pb-4"
@@ -96,7 +82,7 @@ function Cart() {
                     <span className="font-medium">{product.name}</span>
                   </div>
                   <div className="col-span-3 text-right font-medium">
-                    ₦{product.price.toLocaleString()}
+                    {product.price}
                   </div>
                   <div className="col-span-3 flex justify-end items-center gap-4">
                     <button

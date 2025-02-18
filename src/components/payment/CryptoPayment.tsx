@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { useWeb3Modal } from '@web3modal/react';
-import { useAccount } from 'wagmi';
-import { DePay } from '@depay/web3-payments';
-import { Wallet, AlertCircle } from 'lucide-react';
+import { useState } from "react";
+import { useWeb3Modal } from "@web3modal/react";
+import { useAccount } from "wagmi";
+import { DePay } from "@depay/web3-payments";
+import { Wallet, AlertCircle } from "lucide-react";
 
 interface CryptoPaymentProps {
   amount: number;
@@ -16,7 +16,7 @@ export default function CryptoPayment({
   onError,
 }: CryptoPaymentProps) {
   const { open } = useWeb3Modal();
-  const { isConnected } = useAccount();
+  const { address, isConnected } = useAccount();
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handlePayment = async () => {

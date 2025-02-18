@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Server, Menu, X } from 'lucide-react';
+import { Server, Menu, X, ShoppingCart } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Cart from '../cart/Cart';

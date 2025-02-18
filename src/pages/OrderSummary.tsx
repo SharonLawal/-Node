@@ -1,12 +1,15 @@
-import React from "react";
-import { Bitcoin, Feather as Ethereum, CreditCard } from "lucide-react";
 import visa from "../assets/visa.png";
 import verve from "../assets/verve logo.png";
 import master from "../assets/master.png";
 import paypal from "../assets/paypal logo.png";
+import bitcoin from "../assets/bitcoinsv logo.png";
+import eth from "../assets/ether.png";
+import usdt from "../assets/usdt logo.png";
+import { useNavigate } from "react-router-dom";
 function OrderSummary() {
+  const navigate = useNavigate();
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen  flex items-center justify-center p-4">
       <div className="w-[712px] bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100 space-y-8">
         <div className="p-8">
           {/* Header */}
@@ -54,30 +57,31 @@ function OrderSummary() {
           </h2>
 
           {/* Crypto Payment */}
-          <button className="w-full py-3 px-4 border-2 border-gray-200 rounded-xl mb-4 hover:border-blue-500 transition-colors">
+          <button
+            onClick={() => navigate("/pay/crypto")}
+            className="w-[195px] py-3 px-4 border-2 border-gray-200 rounded-xl mb-4 hover:border-blue-500 transition-colors"
+          >
             <div className="flex items-center justify-center space-x-2">
               <span className="text-gray-600">Pay with Crypto</span>
             </div>
           </button>
 
           {/* Crypto Icons */}
-          <div className="flex justify-center space-x-6 mb-6">
-            <Bitcoin className="w-8 h-8" />
-            <Ethereum className="w-8 h-8" />
-            <div className="w-8 h-8 rounded-full bg-teal-500 flex items-center justify-center text-white font-bold">
-              ₮
-            </div>
+          <div className="flex  space-x-6 mb-6">
+            <img src={bitcoin} alt="" />
+            <img src={eth} alt="" />
+            <img src={usdt} alt="" />
           </div>
 
           {/* Fiat Payment */}
-          <button className="w-full py-3 px-4 border-2 border-gray-200 rounded-xl mb-4 hover:border-blue-500 transition-colors">
+          <button className="w-[195px] py-3 px-4 border-2 border-gray-200 rounded-xl mb-4 hover:border-blue-500 transition-colors">
             <div className="flex items-center justify-center space-x-2">
               <span className="text-gray-600">Pay with Fiat</span>
             </div>
           </button>
 
           {/* Payment Method Icons */}
-          <div className="flex justify-center items-center space-x-4 mb-8">
+          <div className="flex  items-center space-x-4 mb-8">
             <img src={visa} alt="" />
             <img src={verve} alt="" />
             <img src={master} alt="" />
@@ -85,9 +89,11 @@ function OrderSummary() {
           </div>
 
           {/* Submit Button */}
-          <button className="w-full py-4 bg-cyan-500 text-white rounded-xl font-semibold hover:bg-cyan-600 transition-colors">
-            Submit Order
-          </button>
+          <div className="flex justify-center">
+            <button className="w-[364px] py-4 bg-cyan-500 text-white rounded-xl font-semibold hover:bg-cyan-600 transition-colors">
+              Submit Order
+            </button>
+          </div>
         </div>
       </div>
     </div>

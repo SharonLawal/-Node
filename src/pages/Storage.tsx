@@ -1,18 +1,13 @@
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
-const Storage = () => {
+const Storage = ({primaryStorageOptions}: any) => {
   const [selectedPrimaryStorage, setSelectedPrimaryStorage] = useState(
-    "512GB NVMe Gen 4 SSD."
+    "1TB SSD"
   );
   const [secondaryStorage, setSecondaryStorage] = useState("None.");
   const [isOpenPrimary, setIsOpenPrimary] = useState(false);
 
-  const primaryStorageOptions = [
-    "512GB NVMe Gen 4 SSD.",
-    "1TB NVMe Gen 4 SSD.",
-    "2TB NVMe Gen 4 SSD.",
-  ];
 
   return (
     <div className="p-5 space-y-3">
@@ -21,7 +16,7 @@ const Storage = () => {
           <p className="text-[30px]">
             <strong>2</strong>
           </p>
-        </div>
+        </div>primaryStorageOptions
         <p className="text-[40px]">Storage</p>
       </div>
 
@@ -37,7 +32,7 @@ const Storage = () => {
             onBlur={() => setIsOpenPrimary(false)}
             onClick={() => setIsOpenPrimary(!isOpenPrimary)}
           >
-            {primaryStorageOptions.map((option, index) => (
+            {primaryStorageOptions?.map((option: any, index: any) => (
               <option key={index} value={option} className="text-black">
                 {option}
               </option>

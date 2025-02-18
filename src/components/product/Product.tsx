@@ -1,4 +1,3 @@
-
 // import React from "react";
 import { Card } from "./ProductCard";
 // import image1 from "../../assets/image (1).png";
@@ -134,15 +133,15 @@ const Product = ({products}: {products: any}) => {
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {products.map((product:any) => (
-          <Card
-            key={product.id} // ✅ product.id is a string now
-            title={product.name}
-            price={product.price}
-            rating={product.rating}
-            imageUrl={product.image}
-            productId={product.id} // ✅ Fixed type issue (id is now a string)
-          />
+        {products?.map((product: any ) => (
+           <Card
+           key={product.id} // ✅ product.id is a string now
+           title={product.name}
+           price={product.price}
+           rating={product.rating}
+           imageUrl={product.image}
+           productId={product.id} // ✅ Fixed type issue (id is now a string)
+         />
         ))}
       </div>
     </div>
