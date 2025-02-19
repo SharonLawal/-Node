@@ -23,15 +23,16 @@ export default function Products() {
   useEffect(() => {
     fetcher("/products")
       .then((res) => {
-        setProducts(res);  // Assuming res is an array of products
-        setIsLoading(false); // Set loading to false after data is fetched
+        console.log("Fetched products:", res); // Debugging
+        setProducts(res);
+        setIsLoading(false);
       })
       .catch((error) => {
-        console.error("Error fetching products:", error);
-        setIsLoading(false); // Set loading to false even if there's an error
+        console.error("Error fetching products:", error); 
+        setIsLoading(false);
       });
   }, []);
-
+  
   const [currentPage, setCurrentPage] = useState(1);
 
   // Calculate the total number of pages based on products length

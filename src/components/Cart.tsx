@@ -10,7 +10,7 @@ export default function Cart() {
 
   // Dynamically calculate total cart price
   const totalCartPrice = items.reduce(
-    (total, item) => total + calculatePrice(item.config) * item.quantity,
+    (total, item) => total + calculatePrice(product.price, item.config) * item.quantity,
     0
   );
 
@@ -30,7 +30,7 @@ export default function Cart() {
 
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
-          <div className="fixed right-0 top-0 h-full w-96 bg-white shadow-lg p-6 overflow-y-auto">
+          <div className="fixed right-0 top-0 h-screen w-96 bg-white shadow-lg p-6 overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold">Your Cart</h2>
               <button onClick={() => setIsOpen(false)}>
@@ -43,7 +43,7 @@ export default function Cart() {
             ) : (
               <>
                 {items.map((item) => {
-                  const finalPrice = calculatePrice(item.config) * item.quantity;
+                  const finalPrice = calculatePrice(product.price, item.config) * item.quantity;
 
                   return (
                     <div key={item.id} className="border-b py-4">
