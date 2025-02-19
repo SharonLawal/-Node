@@ -1,23 +1,15 @@
-/*
-  This code sets up two endpoints for handling Stripe payments:
-  1. /create-payment-intent: Creates a payment intent with a specified amount and currency.
-  2. /confirm-payment-intent: Confirms the payment and stores order details in MongoDB.
-  After successful payment, the order is saved to the database, and an email is sent to the customer.
-*/
-
 const express = require('express');
 const router = express.Router();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const mongoose = require('mongoose');
-const nodemailer = require('nodemailer'); // Import nodemailer
-const Order = require('../models/Order'); // Import Order model
+const nodemailer = require('nodemailer');
+const Order = require('../models/Order');
 
-// Configure nodemailer transporter (Use your SMTP settings)
+// Configure nodemailer transporter
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER, // Your email
-    pass: process.env.EMAIL_PASS, // Your email password
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
@@ -40,51 +32,61 @@ const sendConfirmationEmail = async (customerEmail, orderDetails) => {
   }
 };
 
-// Endpoint to create a payment intent
-router.post('/create-payment-intent', async (req, res) => {
+// Endpoint to create a Stripe Checkout Session
+router.post('/create-checkout-session', async (req, res) => {
   try {
-    const { amount, currency } = req.body;
-    
-    // Create a payment intent
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount,
-      currency: currency || 'ngn',
+    const { orderDetails, customerEmail } = req.body;
+
+    // Create a checkout session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items: orderDetails.items.map((item) => ({
+        price_data: {
+          currency: 'ngn', 
+          product_data: {
+            name: item.name,
+          },
+          unit_amount: item.price * 100, // Convert to kobo
+        },
+        quantity: item.quantity,
+      })),
+      success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.CLIENT_URL}/cancel`,
+      customer_email: customerEmail,
     });
 
-    res.send({ clientSecret: paymentIntent.client_secret });
+    res.json({ sessionId: session.id });
   } catch (error) {
-    console.error('Payment Intent Error:', error);
-    res.status(500).send({ message: 'Error creating payment intent' });
+    console.error('Checkout Session Error:', error);
+    res.status(500).send({ message: 'Error creating checkout session' });
   }
 });
 
-// Endpoint to confirm a payment intent and store the order in MongoDB
-router.post('/confirm-payment-intent', async (req, res) => {
+// Endpoint to verify payment and save order
+router.get('/confirm-payment', async (req, res) => {
   try {
-    const { paymentIntentId, paymentMethodId, orderDetails, customerEmail } = req.body;
+    const session = await stripe.checkout.sessions.retrieve(req.query.session_id);
 
-    // Confirm the payment intent
-    const paymentIntent = await stripe.paymentIntents.confirm(paymentIntentId, {
-      payment_method: paymentMethodId,
-    });
+    if (session.payment_status === 'paid') {
+      const orderDetails = JSON.parse(session.metadata.orderDetails);
 
-    // If payment is successful, save order details to MongoDB
-    if (paymentIntent.status === 'succeeded') {
-      const newOrder = new Order(orderDetails); // Create new order document
-      await newOrder.save(); // Save order in MongoDB
+      // Save order to MongoDB
+      const newOrder = new Order(orderDetails);
+      await newOrder.save();
 
-      // Send email confirmation
-      if (customerEmail) {
-        await sendConfirmationEmail(customerEmail, orderDetails);
+      // Send confirmation email
+      if (session.customer_email) {
+        await sendConfirmationEmail(session.customer_email, orderDetails);
       }
 
-      res.send({ status: 'Payment confirmed', paymentIntent, order: newOrder });
+      res.json({ status: 'success', order: newOrder });
     } else {
-      res.status(400).send({ message: 'Payment failed', paymentIntent });
+      res.status(400).json({ message: 'Payment not completed' });
     }
   } catch (error) {
     console.error('Payment Confirmation Error:', error);
-    res.status(500).send({ message: 'Error confirming payment intent' });
+    res.status(500).send({ message: 'Error confirming payment' });
   }
 });
 
