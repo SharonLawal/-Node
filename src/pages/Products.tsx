@@ -1,16 +1,20 @@
-import ProductCard from '../components/product/ProductCard';
-import Pagination from '../components/product/Pagination';
+import ProductCard from "../components/product/ProductCard";
+import Pagination from "../components/product/Pagination";
 import { fetcher } from "../services/api";
 import { useEffect, useState } from "react";
 
 // Define types for product and response to improve type safety
 type Product = {
-  id: number;
+  id: string;
   name: string;
   price: number;
   description: string;
   image: string;
-  specs: [];
+  specs: {
+    defaultRam: string;
+    defaultStorage: string;
+    defaultProcessor: string;
+  };
 };
 
 const PRODUCTS_PER_PAGE = 6;
@@ -24,20 +28,24 @@ export default function Products() {
     fetcher("/products")
       .then((res) => {
         console.log("Fetched products:", res); // Debugging
-        setProducts(res);
+        if (Array.isArray(res)) {
+          setProducts(res);
+        } else {
+          console.error("Unexpected response format:", res);
+        }
         setIsLoading(false);
       })
       .catch((error) => {
-        console.error("Error fetching products:", error); 
+        console.error("Error fetching products:", error);
         setIsLoading(false);
       });
   }, []);
-  
+
   const [currentPage, setCurrentPage] = useState(1);
 
   // Calculate the total number of pages based on products length
   const totalPages = Math.ceil(products.length / PRODUCTS_PER_PAGE);
-  
+
   // Get the products to display for the current page
   const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
   const endIndex = startIndex + PRODUCTS_PER_PAGE;
@@ -45,7 +53,7 @@ export default function Products() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -59,7 +67,7 @@ export default function Products() {
         <div className="text-center text-lg">Loading products...</div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {currentProducts.map(product => (
+          {currentProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

@@ -21,7 +21,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     addItem(product, config);
   };
 
-  const basePrice = Number(product.price);
+  const basePrice = product.price;
   const price = calculatePrice(basePrice, config);
 
   return (
