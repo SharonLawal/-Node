@@ -1,30 +1,24 @@
 import { useState } from 'react';
-import { useCartStore } from '../../store/cartStore';
+import PaymentOptions from './PaymentOptions';
 
 interface PaymentButtonProps {
   amount: number;
+  orderDetails: any;
 }
 
-export default function PaymentButton({ amount }: PaymentButtonProps) {
-  const [isProcessing, setIsProcessing] = useState(false);
-  const clearCart = useCartStore((state) => state.clearCart);
+export default function PaymentButton({ amount, orderDetails }: PaymentButtonProps) {
+  const [showPaymentOptions, setShowPaymentOptions] = useState(false);
 
-  const handlePayment = async () => {
-    setIsProcessing(true);
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    clearCart();
-    setIsProcessing(false);
-    alert('Payment successful! Thank you for your order.');
-  };
+  if (showPaymentOptions) {
+    return <PaymentOptions amount={amount} onSuccess={() => console.log('Payment Successful')} />;
+  }
 
   return (
     <button
-      onClick={handlePayment}
-      disabled={isProcessing}
-      className="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors disabled:bg-gray-400"
+      onClick={() => setShowPaymentOptions(true)}
+      className="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors"
     >
-      {isProcessing ? 'Processing...' : 'Complete Payment'}
+      Proceed to Payment
     </button>
   );
 }

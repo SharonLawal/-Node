@@ -1,48 +1,72 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { CreditCard, Wallet, ArrowRight } from 'lucide-react';
-import Web3 from 'web3';
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { CreditCard, Wallet } from "lucide-react";
+import CryptoPayment from "./CryptoPayment";
+import CreditCardForm from "./CreditCardForm";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from '@stripe/react-stripe-js';
+
+const stripePromise = loadStripe(
+  "pk_test_51QnhLvFHwL9JgzZgyBAw7V9SpqZOb5U4ZTj0Rj9Iybcw7KXpWWQ8EbzLhHf8sElzq6JAvlXzBZStaI0kKqKF0W0s00VfB19zSK"
+);
 
 interface PaymentOptionsProps {
   amount: number;
   onSuccess: () => void;
 }
 
-export default function PaymentOptions({ amount, onSuccess }: PaymentOptionsProps) {
-  const [selectedMethod, setSelectedMethod] = useState<'card' | 'crypto' | null>(null);
+export default function PaymentOptions({
+  amount,
+  onSuccess,
+}: PaymentOptionsProps) {
+  const [selectedMethod, setSelectedMethod] = useState<
+    "card" | "crypto" | null
+  >(null);
   const [processing, setProcessing] = useState(false);
 
-  const handleCardPayment = async () => {
-    setProcessing(true);
-    // Simulate card payment processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setProcessing(false);
-    onSuccess();
-  };
-
-  const handleCryptoPayment = async () => {
+  const handleCardPayment = async (paymentDetails: {
+    paymentMethodId: string;
+    orderDetails: any;
+  }) => {
     setProcessing(true);
     try {
-      if (typeof window.ethereum !== 'undefined') {
-        const web3 = new Web3(window.ethereum);
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        
-        const accounts = await web3.eth.getAccounts();
-        const weiAmount = web3.utils.toWei(amount.toString(), 'ether');
-        
-        await web3.eth.sendTransaction({
-          from: accounts[0],
-          to: '0xYourReceiverAddress', // Replace with actual address
-          value: weiAmount
-        });
-        
-        onSuccess();
-      } else {
-        alert('Please install MetaMask to make crypto payments');
+      const createIntentResponse = await fetch(
+        "https://node-307s.onrender.com/api/create-payment-intent",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount, currency: "usd" }),
+        }
+      );
+
+      if (!createIntentResponse.ok) {
+        throw new Error("Failed to create payment intent");
       }
+
+      const responseData = await createIntentResponse.json();
+      const clientSecret = responseData.clientSecret;
+
+      const confirmPaymentResponse = await fetch(
+        "https://node-307s.onrender.com/api/confirm-payment-intent",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            paymentIntentId: clientSecret,
+            paymentMethodId: paymentDetails.paymentMethodId,
+            orderDetails: paymentDetails.orderDetails,
+          }),
+        }
+      );
+
+      if (!confirmPaymentResponse.ok) {
+        throw new Error("Payment confirmation failed.");
+      }
+
+      onSuccess();
     } catch (error) {
-      console.error('Payment failed:', error);
-      alert('Payment failed. Please try again.');
+      console.error("Payment failed:", error);
+      alert("An error occurred while processing the payment.");
     }
     setProcessing(false);
   };
@@ -53,11 +77,11 @@ export default function PaymentOptions({ amount, onSuccess }: PaymentOptionsProp
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => setSelectedMethod('card')}
+          onClick={() => setSelectedMethod("card")}
           className={`p-6 rounded-xl border-2 transition-colors ${
-            selectedMethod === 'card'
-              ? 'border-green-500 bg-green-50'
-              : 'border-gray-200 hover:border-green-200'
+            selectedMethod === "card"
+              ? "border-green-500 bg-green-50"
+              : "border-gray-200 hover:border-green-200"
           }`}
         >
           <CreditCard className="h-8 w-8 mb-4 text-green-500" />
@@ -68,11 +92,11 @@ export default function PaymentOptions({ amount, onSuccess }: PaymentOptionsProp
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => setSelectedMethod('crypto')}
+          onClick={() => setSelectedMethod("crypto")}
           className={`p-6 rounded-xl border-2 transition-colors ${
-            selectedMethod === 'crypto'
-              ? 'border-green-500 bg-green-50'
-              : 'border-gray-200 hover:border-green-200'
+            selectedMethod === "crypto"
+              ? "border-green-500 bg-green-50"
+              : "border-gray-200 hover:border-green-200"
           }`}
         >
           <Wallet className="h-8 w-8 mb-4 text-green-500" />
@@ -85,26 +109,21 @@ export default function PaymentOptions({ amount, onSuccess }: PaymentOptionsProp
         {selectedMethod && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              disabled={processing}
-              onClick={selectedMethod === 'card' ? handleCardPayment : handleCryptoPayment}
-              className="w-full bg-green-500 text-white py-4 rounded-lg flex items-center justify-center space-x-2 disabled:bg-gray-400"
-            >
-              {processing ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
-              ) : (
-                <>
-                  <span>Pay ${amount}</span>
-                  <ArrowRight className="h-5 w-5" />
-                </>
-              )}
-            </motion.button>
+            {selectedMethod === "card" ? (
+              <Elements stripe={stripePromise}>
+                <CreditCardForm onSubmit={handleCardPayment} />
+              </Elements>
+            ) : (
+              <CryptoPayment
+                amount={amount}
+                onSuccess={onSuccess}
+                onError={() => alert("Crypto payment failed")}
+              />
+            )}
           </motion.div>
         )}
       </AnimatePresence>

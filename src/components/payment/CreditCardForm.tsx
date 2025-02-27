@@ -1,111 +1,91 @@
 import { useState } from 'react';
+import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 import { CreditCard, Lock } from 'lucide-react';
 
 interface CreditCardFormProps {
-  onSubmit: () => void;
+  onSubmit: (paymentDetails: { paymentMethodId: string; orderDetails: any }) => Promise<void>;
 }
 
 export default function CreditCardForm({ onSubmit }: CreditCardFormProps) {
-  const [formData, setFormData] = useState({
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
-    name: ''
-  });
+  const stripe = useStripe();
+  const elements = useElements();
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit();
-  };
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!stripe || !elements) {
+      alert('Stripe has not loaded yet.');
+      return;
+    }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setLoading(true);
+
+    const cardElement = elements.getElement(CardElement);
+    if (!cardElement) {
+      alert('Card element not found.');
+      setLoading(false);
+      return;
+    }
+
+    const { paymentMethod, error } = await stripe.createPaymentMethod({
+      type: 'card',
+      card: cardElement,
+      billing_details: {
+        name,
+        email,
+      },
+    });
+
+    if (error) {
+      alert(error.message);
+      setLoading(false);
+      return;
+    }
+
+    await onSubmit({ paymentMethodId: paymentMethod.id, orderDetails: { email, name } });
+
+    setLoading(false);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Card Number
-        </label>
-        <div className="relative">
-          <input
-            type="text"
-            name="cardNumber"
-            placeholder="1234 5678 9012 3456"
-            required
-            pattern="\d*"
-            maxLength={19}
-            value={formData.cardNumber}
-            onChange={handleChange}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          />
-          <CreditCard className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Expiry Date
-          </label>
-          <input
-            type="text"
-            name="expiryDate"
-            placeholder="MM/YY"
-            required
-            pattern="\d\d/\d\d"
-            maxLength={5}
-            value={formData.expiryDate}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            CVV
-          </label>
-          <input
-            type="text"
-            name="cvv"
-            placeholder="123"
-            required
-            pattern="\d{3,4}"
-            maxLength={4}
-            value={formData.cvv}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          />
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Name on Card
-        </label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Name on Card</label>
         <input
           type="text"
-          name="name"
           required
-          value={formData.name}
-          onChange={handleChange}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
         />
       </div>
 
-      <div className="flex items-center space-x-2 text-sm text-gray-500">
-        <Lock className="h-4 w-4" />
-        <span>Your payment information is secure and encrypted</span>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Card Details</label>
+        <div className="border border-gray-300 rounded-lg p-3">
+          <CardElement options={{ hidePostalCode: true }} />
+        </div>
       </div>
 
       <button
         type="submit"
-        className="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center space-x-2"
+        disabled={loading}
+        className="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors"
       >
-        <CreditCard className="h-5 w-5" />
-        <span>Complete Payment</span>
+        {loading ? 'Processing...' : 'Complete Payment'}
       </button>
     </form>
   );

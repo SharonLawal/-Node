@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useWeb3Modal } from '@web3modal/react';
 import { useAccount } from 'wagmi';
-import { DePay } from '@depay/web3-payments';
+//import DePay from '@depay/web3-payments';
 import { Wallet, AlertCircle } from 'lucide-react';
 
 interface CryptoPaymentProps {
@@ -10,9 +10,13 @@ interface CryptoPaymentProps {
   onError: (error: string) => void;
 }
 
-export default function CryptoPayment({ amount, onSuccess, onError }: CryptoPaymentProps) {
+export default function CryptoPayment({
+  amount,
+  onSuccess,
+  onError,
+}: CryptoPaymentProps) {
   const { open } = useWeb3Modal();
-  const { address, isConnected } = useAccount();
+  const { isConnected } = useAccount();
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handlePayment = async () => {
@@ -26,27 +30,27 @@ export default function CryptoPayment({ amount, onSuccess, onError }: CryptoPaym
       const payment = await DePay.Payment({
         accept: [
           {
-            blockchain: 'ethereum',
-            token: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', // ETH
+            blockchain: "ethereum",
+            token: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", // ETH
             amount: amount,
           },
           {
-            blockchain: 'ethereum',
-            token: '0xdAC17F958D2ee523a2206206994597C13D831ec7', // USDT
+            blockchain: "ethereum",
+            token: "0xdAC17F958D2ee523a2206206994597C13D831ec7", // USDT
             amount: amount,
-          }
+          },
         ],
         receiver: import.meta.env.VITE_RECEIVER_ADDRESS,
       });
 
-      if (payment.status === 'succeeded') {
+      if (payment.status === "succeeded") {
         onSuccess();
       } else {
-        onError('Payment failed. Please try again.');
+        onError("Payment failed. Please try again.");
       }
     } catch (error) {
-      onError('Payment failed. Please try again.');
-      console.error('Payment error:', error);
+      onError("Payment failed. Please try again.");
+      console.error("Payment error:", error);
     } finally {
       setIsProcessing(false);
     }
@@ -84,7 +88,7 @@ export default function CryptoPayment({ amount, onSuccess, onError }: CryptoPaym
         ) : (
           <>
             <Wallet className="h-5 w-5" />
-            <span>{isConnected ? 'Pay with Crypto' : 'Connect Wallet'}</span>
+            <span>{isConnected ? "Pay with Crypto" : "Connect Wallet"}</span>
           </>
         )}
       </button>
