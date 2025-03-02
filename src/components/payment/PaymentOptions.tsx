@@ -2,13 +2,6 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CreditCard, Wallet } from "lucide-react";
 import CryptoPayment from "./CryptoPayment";
-import CreditCardForm from "./CreditCardForm";
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements } from '@stripe/react-stripe-js';
-
-const stripePromise = loadStripe(
-  "pk_test_51QnhLvFHwL9JgzZgyBAw7V9SpqZOb5U4ZTj0Rj9Iybcw7KXpWWQ8EbzLhHf8sElzq6JAvlXzBZStaI0kKqKF0W0s00VfB19zSK"
-);
 
 interface PaymentOptionsProps {
   amount: number;
@@ -19,51 +12,37 @@ export default function PaymentOptions({
   amount,
   onSuccess,
 }: PaymentOptionsProps) {
-  const [selectedMethod, setSelectedMethod] = useState<
-    "card" | "crypto" | null
-  >(null);
+  const [selectedMethod, setSelectedMethod] = useState<"card" | "crypto" | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [email, setEmail] = useState(""); // Capture user email
 
-  const handleCardPayment = async (paymentDetails: {
-    paymentMethodId: string;
-    orderDetails: any;
-  }) => {
+  const handleCardPayment = async () => {
     setProcessing(true);
+    setSelectedMethod("card");
+
     try {
-      const createIntentResponse = await fetch(
-        "https://node-307s.onrender.com/api/create-payment-intent",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount, currency: "usd" }),
-        }
-      );
+      const response = await fetch("http://node-307s.onrender.com/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer_email: email || "customer@example.com", // Use provided email or a default
+          line_items: [
+            {
+              price_data: {
+                currency: "usd",
+                product_data: { name: "Custom Product" },
+                unit_amount: amount * 100,
+              },
+              quantity: 1,
+            },
+          ],
+        }),
+      });
 
-      if (!createIntentResponse.ok) {
-        throw new Error("Failed to create payment intent");
-      }
+      if (!response.ok) throw new Error("Failed to create checkout session");
 
-      const responseData = await createIntentResponse.json();
-      const clientSecret = responseData.clientSecret;
-
-      const confirmPaymentResponse = await fetch(
-        "https://node-307s.onrender.com/api/confirm-payment-intent",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            paymentIntentId: clientSecret,
-            paymentMethodId: paymentDetails.paymentMethodId,
-            orderDetails: paymentDetails.orderDetails,
-          }),
-        }
-      );
-
-      if (!confirmPaymentResponse.ok) {
-        throw new Error("Payment confirmation failed.");
-      }
-
-      onSuccess();
+      const { url } = await response.json();
+      window.location.href = url; // Redirect to Stripe Checkout
     } catch (error) {
       console.error("Payment failed:", error);
       alert("An error occurred while processing the payment.");
@@ -73,11 +52,20 @@ export default function PaymentOptions({
 
   return (
     <div className="space-y-6">
+      <input
+        type="email"
+        placeholder="Enter your email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="w-full p-3 border border-gray-300 rounded-md"
+      />
+
       <div className="grid grid-cols-2 gap-4">
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => setSelectedMethod("card")}
+          onClick={handleCardPayment}
+          disabled={processing}
           className={`p-6 rounded-xl border-2 transition-colors ${
             selectedMethod === "card"
               ? "border-green-500 bg-green-50"
@@ -106,24 +94,18 @@ export default function PaymentOptions({
       </div>
 
       <AnimatePresence>
-        {selectedMethod && (
+        {selectedMethod === "crypto" && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
-            {selectedMethod === "card" ? (
-              <Elements stripe={stripePromise}>
-                <CreditCardForm onSubmit={handleCardPayment} />
-              </Elements>
-            ) : (
-              <CryptoPayment
-                amount={amount}
-                onSuccess={onSuccess}
-                onError={() => alert("Crypto payment failed")}
-              />
-            )}
+            <CryptoPayment
+              amount={amount}
+              onSuccess={onSuccess}
+              onError={() => alert("Crypto payment failed")}
+            />
           </motion.div>
         )}
       </AnimatePresence>

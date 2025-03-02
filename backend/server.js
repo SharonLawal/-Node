@@ -12,6 +12,7 @@ const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const paymentRouter = require('./routes/paymentRoutes');
+const webhookRoutes = require('./routes/webhookRoutes');
 
 // Initialize the app
 const app = express();
@@ -48,6 +49,10 @@ app.use("/api", productRoutes);
 app.use("/api", orderRoutes);
 app.use("/api", paymentRouter);
 app.use("/admin", adminRoutes);
+app.use("/api", webhookRoutes);
+
+// Stripe requires raw body for webhooks
+app.post("/api/stripe-webhook", express.raw({ type: "application/json" }), webhookRoutes);
 
 // Root route
 app.get('/', (req, res) => {

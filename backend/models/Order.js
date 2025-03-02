@@ -1,36 +1,22 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const orderSchema = new mongoose.Schema({
-  orderID: { type: String, required: true, unique: true },
-  customer: {
-    firstName: String,
-    lastName: String,
-    email: String,
-    phoneNumber: String,
-    country: String,
-    state: String,
-    deliveryAddress: String,
+const orderSchema = new mongoose.Schema(
+  {
+    customer_email: { type: String, required: true },
+    products: [
+      {
+        name: { type: String, required: true },
+        price: { type: Number, required: true },
+        quantity: { type: Number, required: true },
+      },
+    ],
+    total_amount: { type: Number, required: true },
+    payment_status: { type: String, enum: ["pending", "paid"], default: "pending" },
+    shipping_address: { type: Object },
+    billing_address: { type: Object },
+    stripe_session_id: { type: String, required: true },
   },
-  products: [
-    {
-      productID: String,
-      name: String,
-      price: Number,
-      quantity: Number,
-      customization: Object, // Can be further structured if needed
-    },
-  ],
-  shippingInfo: {
-    countryOfDelivery: String,
-    stateOfDelivery: String,
-    deliveryAddress: String,
-    intendedUse: String,
-  },
-  totalPrice: Number,
-  orderStatus: { type: String, default: 'Pending' },
-  warranty: String,
-  shippingPolicy: String,
-  customerSupport: String,
-}, { timestamps: true });
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('Order', orderSchema);
+module.exports = mongoose.model("Order", orderSchema);
