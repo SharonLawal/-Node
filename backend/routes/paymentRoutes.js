@@ -58,3 +58,5 @@ router.post("/create-checkout-session", async (req, res) => {
     res.status(500).json({ message: "Error creating checkout session" });
   }
 });
+
+module.exports = router;

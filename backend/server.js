@@ -59,10 +59,10 @@ const paymentRouter = require('./routes/paymentRoutes');
 // If you have webhook routes, import and mount them appropriately
 
 // Define routes
-// app.use("/api", productRoutes);
-// app.use("/api", orderRoutes);
-// app.use("/api", paymentRouter);
-// app.use("/admin", adminRoutes);
+app.use("/api", productRoutes);
+app.use("/api", orderRoutes);
+app.use("/api", paymentRouter);
+app.use("/admin", adminRoutes);
 
 // Root route
 app.get('/', (req, res) => {
