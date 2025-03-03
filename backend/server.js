@@ -32,7 +32,7 @@ app.use(cors({
 
 // Set up MongoDB session store
 const store = new MongoDBStore({
-  uri: "mongodb+srv://guildtechnology0:AGNKDFi6644ZkkEd@cluster0.tdauz.mongodb.net/Node?retryWrites=true&w=majority" + 'Node',
+  uri: "mongodb+srv://guildtechnology0:AGNKDFi6644ZkkEd@cluster0.tdauz.mongodb.net/Node",
   collection: 'sessions',
 });
 
@@ -59,10 +59,10 @@ const paymentRouter = require('./routes/paymentRoutes');
 // If you have webhook routes, import and mount them appropriately
 
 // Define routes
-app.use("/api", productRoutes);
-app.use("/api", orderRoutes);
-app.use("/api", paymentRouter);
-app.use("/admin", adminRoutes);
+// app.use("/api", productRoutes);
+// app.use("/api", orderRoutes);
+// app.use("/api", paymentRouter);
+// app.use("/admin", adminRoutes);
 
 // Root route
 app.get('/', (req, res) => {
