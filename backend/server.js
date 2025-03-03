@@ -17,11 +17,6 @@ require('./config/database');
 app.use(express.json());
 app.use(bodyParser.json());
 
-// Configure CORS
-const cors = require("cors");
-const express = require("express");
-const app = express();
-
 app.use(cors({
   origin: [
     "http://localhost:5173",
