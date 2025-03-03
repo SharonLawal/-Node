@@ -18,6 +18,10 @@ app.use(express.json());
 app.use(bodyParser.json());
 
 // Configure CORS
+const cors = require("cors");
+const express = require("express");
+const app = express();
+
 app.use(cors({
   origin: [
     "http://localhost:5173",
@@ -29,6 +33,9 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"],
   methods: ["GET", "POST", "PUT", "DELETE"],
 }));
+
+// Handle preflight requests explicitly
+app.options("*", cors());
 
 // Set up MongoDB session store
 const store = new MongoDBStore({
