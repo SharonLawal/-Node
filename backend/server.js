@@ -1,58 +1,70 @@
-// Load environment variables and required modules
 const dotenv = require('dotenv');
-dotenv.config({ path: './process.env' });
+dotenv.config({ path: './process.env' }); // Loads .env
 
 const express = require("express");
 const cors = require("cors");
-const session = require("express-session");
 const bodyParser = require("body-parser");
+const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
 
-// Import route handlers
-const productRoutes = require("./routes/productRoutes");
-const orderRoutes = require("./routes/orderRoutes");
-const adminRoutes = require("./routes/adminRoutes");
-const paymentRouter = require('./routes/paymentRoutes');
-const webhookRoutes = require('./routes/webhookRoutes');
-
-// Initialize the app
 const app = express();
 
-// Database connection setup
+// Connect to MongoDB
 require('./config/database');
 
 // Middleware setup
 app.use(express.json());
 app.use(bodyParser.json());
 
-// Configure CORS to allow frontend connection with credentials
+// Configure CORS
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174", "https://nodebridge101.netlify.app", "https://node-307s.onrender.com"], // Add your backend domain
-  credentials: true, // Allow cookies and session sharing
-  allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
-  methods: ["GET", "POST", "PUT", "DELETE"], // Allowed request methods
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://nodebridge101.netlify.app",
+    "https://node-307s.onrender.com"
+  ],
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
 }));
+
+// Set up MongoDB session store
+const store = new MongoDBStore({
+  uri: process.env.MONGO_URI + 'Node',
+  collection: 'sessions',
+});
+
+store.on('error', (error) => console.error("❌ MongoDB Store Error:", error));
 
 // Set up session middleware
 app.use(session({
-  secret: "super-secret-key",
+  store,
+  secret: process.env.SESSION_SECRET || "default_secret",
   resave: false,
   saveUninitialized: false,
   cookie: {
+    secure: process.env.NODE_ENV === "production",
     httpOnly: true,
-    secure: false, // Change to `true` if using HTTPS
-    sameSite: "lax",
-  },
+    sameSite: 'strict',
+  }
 }));
 
-// Define routes
+// Import route handlers
+const productRoutes = require("./routes/productRoutes");
+const orderRoutes = require("./routes/orderRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+const paymentRouter = require('./routes/paymentRoutes');
+const webhookRoutes = require('./routes/webhook');
+
+// Define other routes
 app.use("/api", productRoutes);
 app.use("/api", orderRoutes);
 app.use("/api", paymentRouter);
 app.use("/admin", adminRoutes);
-app.use("/api", webhookRoutes);
 
-// Stripe requires raw body for webhooks
-app.post("/api/stripe-webhook", express.raw({ type: "application/json" }), webhookRoutes);
+// Mount webhook route using raw body middleware
+app.use("/api/stripe-webhook", express.raw({ type: "application/json" }), webhookRoutes);
 
 // Root route
 app.get('/', (req, res) => {
