@@ -45,7 +45,6 @@ router.post("/create-checkout-session", async (req, res) => {
       mode: "payment",
       success_url: `${YOUR_DOMAIN}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${YOUR_DOMAIN}/canceled`,
-      metadata: { order_id: savedOrder._id.toString() }, // Attach order ID to session
     });
     
     // Update order with the Stripe session ID
