@@ -14,7 +14,7 @@ const orderSchema = new mongoose.Schema(
     payment_status: { type: String, enum: ["pending", "paid"], default: "pending" },
     shipping_address: { type: Object },
     billing_address: { type: Object },
-    stripe_session_id: { type: String, required: false },
+    stripe_session_id: { type: String, required: true },
   },
   { timestamps: true }
 );
