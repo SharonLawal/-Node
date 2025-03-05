@@ -48,6 +48,14 @@ router.post("/create-checkout-session", async (req, res) => {
       metadata: { order_id: savedOrder._id.toString() }, // Attach order ID to session
     });
 
+    const existingOrder = await Order.findOne({ orderID: null });
+
+    if (existingOrder) {
+      existingOrder.orderID = new mongoose.Types.ObjectId().toString();
+      await existingOrder.save();
+    }
+
+
     // Update order with the Stripe session ID
     savedOrder.stripe_session_id = session.id;
     await savedOrder.save();
