@@ -15,7 +15,7 @@ const orderSchema = new mongoose.Schema(
     shipping_address: { type: Object },
     billing_address: { type: Object },
     stripe_session_id: { type: String, required: false },
-    orderID: new mongoose.Types.ObjectId().toString(),
+    orderID: { type: String, default: mongoose.Types.ObjectId },
   },
   { timestamps: true }
 );
